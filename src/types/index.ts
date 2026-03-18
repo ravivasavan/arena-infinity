@@ -21,7 +21,11 @@ export interface ArenaBlock {
     display?: { url: string };
   } | null;
   source?: { url: string } | null;
+  embed?: { url: string; type: string; html?: string } | null;
+  description?: string | null;
   connections?: ArenaChannel[];
+  connected_at?: string;
+  connection_count?: number;
 }
 
 export interface ArenaUser {
@@ -40,6 +44,10 @@ export interface ChannelNodeData {
   channel: ArenaChannel;
   expanded: boolean;
   loading: boolean;
+  previewBlocks?: ArenaBlock[];
+  color?: string;
+  loadedCount?: number;
+  totalBlocks?: number;
 }
 
 export interface BlockNodeData {
@@ -48,6 +56,7 @@ export interface BlockNodeData {
   block: ArenaBlock;
   expanded: boolean;
   loading: boolean;
+  color?: string;
 }
 
 export type GraphNodeData = ChannelNodeData | BlockNodeData;

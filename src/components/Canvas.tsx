@@ -1,21 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   ReactFlow,
   Background,
-  Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  type Node,
   type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { ChannelNode } from "./ChannelNode";
 import { BlockNode } from "./BlockNode";
-import { SearchBar } from "./SearchBar";
+import { ChannelIndex } from "./ChannelIndex";
+import { CanvasControls } from "./CanvasControls";
 import { useGraphStore } from "@/hooks/useGraphStore";
-import type { ArenaChannel } from "@/types";
 
 const nodeTypes: NodeTypes = {
   channelNode: ChannelNode,
@@ -25,12 +25,13 @@ const nodeTypes: NodeTypes = {
 export function Canvas() {
   const storeNodes = useGraphStore((s) => s.nodes);
   const storeEdges = useGraphStore((s) => s.edges);
-  const addChannelNodes = useGraphStore((s) => s.addChannelNodes);
+  const activeNodeId = useGraphStore((s) => s.activeNodeId);
+  const { setCenter, getZoom } = useReactFlow();
+  const prevActiveRef = useRef<string | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
 
-  // Sync store → local state
   useEffect(() => {
     setNodes(storeNodes);
   }, [storeNodes, setNodes]);
@@ -39,35 +40,47 @@ export function Canvas() {
     setEdges(storeEdges);
   }, [storeEdges, setEdges]);
 
-  // Load user's channels on mount
+  // Center on active node after layout changes
   useEffect(() => {
-    async function loadInitialChannels() {
-      try {
-        const res = await fetch("/api/users/channels");
-        if (res.ok) {
-          const data = await res.json();
-          const channels: ArenaChannel[] = data.channels || [];
-          addChannelNodes(channels);
-        }
-      } catch {
-        // silently fail — user can use search
+    if (!activeNodeId || activeNodeId === prevActiveRef.current) return;
+    prevActiveRef.current = activeNodeId;
+
+    // Small delay to let layout settle
+    const timer = setTimeout(() => {
+      const node = storeNodes.find((n) => n.id === activeNodeId);
+      if (node) {
+        const zoom = Math.max(getZoom(), 0.5);
+        setCenter(node.position.x + 100, node.position.y + 50, { zoom, duration: 300 });
       }
-    }
-    loadInitialChannels();
-  }, [addChannelNodes]);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [activeNodeId, storeNodes, setCenter, getZoom]);
+
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      if (event.metaKey && node.type === "channelNode") {
+        const connectedIds = new Set<string>();
+        connectedIds.add(node.id);
+        for (const edge of storeEdges) {
+          if (edge.source === node.id) connectedIds.add(edge.target);
+          if (edge.target === node.id) connectedIds.add(edge.source);
+        }
+        setNodes((nds) =>
+          nds.map((n) => ({
+            ...n,
+            selected: connectedIds.has(n.id) || n.selected,
+          }))
+        );
+      }
+    },
+    [storeEdges, setNodes]
+  );
 
   const defaultEdgeOptions = useMemo(
     () => ({
-      animated: true,
+      animated: false,
       style: { stroke: "#525252" },
     }),
-    []
-  );
-
-  const onNodeDragStop = useCallback(
-    (_event: React.MouseEvent, _node: { id: string; position: { x: number; y: number } }) => {
-      // Node positions are updated by React Flow's internal state via onNodesChange
-    },
     []
   );
 
@@ -78,7 +91,7 @@ export function Canvas() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeDragStop={onNodeDragStop}
+        onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
@@ -87,15 +100,8 @@ export function Canvas() {
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#333" gap={32} />
-        <Controls className="!bg-neutral-800 !border-neutral-700 [&>button]:!bg-neutral-800 [&>button]:!border-neutral-700 [&>button]:!text-white [&>button:hover]:!bg-neutral-700" />
-        <MiniMap
-          nodeColor={(n) =>
-            n.type === "channelNode" ? "#22c55e" : "#3b82f6"
-          }
-          maskColor="rgba(0,0,0,0.8)"
-          className="!bg-neutral-900 !border-neutral-700"
-        />
-        <SearchBar />
+        <CanvasControls />
+        <ChannelIndex />
       </ReactFlow>
     </div>
   );
