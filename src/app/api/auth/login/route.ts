@@ -15,7 +15,6 @@ export async function GET() {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "read");
 
   return NextResponse.redirect(url.toString());
 }
