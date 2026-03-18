@@ -25,12 +25,12 @@ export async function getUserChannels(
   per = 50
 ): Promise<{ channels: ArenaChannel[]; total_pages: number }> {
   const data = await arenaFetch(
-    `/users/${userId}/contents?type=channels&page=${page}&per=${per}`,
+    `/users/${userId}/contents?type=Channel&page=${page}&per=${per}`,
     token
   );
   return {
-    channels: data.contents ?? data.channels ?? data,
-    total_pages: data.total_pages ?? 1,
+    channels: data.data ?? data.contents ?? data.channels ?? [],
+    total_pages: data.meta?.total_pages ?? data.total_pages ?? 1,
   };
 }
 
@@ -45,8 +45,8 @@ export async function getChannelContents(
     token
   );
   return {
-    contents: data.contents ?? [],
-    total_pages: data.total_pages ?? 1,
+    contents: data.data ?? data.contents ?? [],
+    total_pages: data.meta?.total_pages ?? data.total_pages ?? 1,
   };
 }
 
@@ -55,7 +55,7 @@ export async function getBlockConnections(
   token: string
 ): Promise<ArenaChannel[]> {
   const data = await arenaFetch(`/blocks/${blockId}/connections`, token);
-  return data.contents ?? data.connections ?? [];
+  return data.data ?? data.contents ?? data.connections ?? [];
 }
 
 export async function searchChannels(
@@ -68,5 +68,5 @@ export async function searchChannels(
     `/search?query=${encodeURIComponent(query)}&type=Channel&page=${page}&per=${per}`,
     token
   );
-  return data.results ?? data.contents ?? data.channels ?? [];
+  return data.data ?? [];
 }
