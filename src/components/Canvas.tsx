@@ -66,6 +66,15 @@ export function Canvas() {
     return () => clearTimeout(timer);
   }, [activeNodeId, storeNodes, setCenter, getZoom]);
 
+  const removeNodes = useGraphStore((s) => s.removeNodes);
+
+  const onNodesDelete = useCallback(
+    (deleted: Node[]) => {
+      removeNodes(deleted.map((n) => n.id));
+    },
+    [removeNodes]
+  );
+
   const onNodeClick = useCallback(
     (event: React.MouseEvent, node: Node) => {
       if (event.metaKey && node.type === "channelNode") {
@@ -102,6 +111,7 @@ export function Canvas() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodesDelete={onNodesDelete}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}

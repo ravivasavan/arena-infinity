@@ -56,6 +56,7 @@ interface GraphState {
   addSearchChannel: (channel: ArenaChannel, viewportCenter: { x: number; y: number }) => Promise<void>;
   loadMoreBlocks: (channelSlug: string, nodeId: string) => Promise<void>;
   collapseNode: (nodeId: string) => void;
+  removeNodes: (nodeIds: string[]) => void;
   relayout: () => void;
   resetGraph: () => void;
 }
@@ -448,6 +449,18 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     // Also remove collapsed children from expanded set
     for (const id of removedIds) expanded.delete(id);
 
+    set({ nodes, edges, expandedNodes: expanded });
+  },
+
+  removeNodes: (nodeIds) => {
+    const removedSet = new Set(nodeIds);
+    const state = get();
+    const nodes = state.nodes.filter((n) => !removedSet.has(n.id));
+    const edges = state.edges.filter(
+      (e) => !removedSet.has(e.source as string) && !removedSet.has(e.target as string)
+    );
+    const expanded = new Set(state.expandedNodes);
+    for (const id of nodeIds) expanded.delete(id);
     set({ nodes, edges, expandedNodes: expanded });
   },
 
