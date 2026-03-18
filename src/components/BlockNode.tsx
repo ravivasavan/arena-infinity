@@ -135,9 +135,9 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         {/* Title bar */}
         <div className="px-3 py-2">
           <span className="truncate text-xs text-neutral-400 block">{title}</span>
-          {block.description && block.class !== "Text" && (
+          {block.description && blockType !== "Text" && (
             <p className="text-[10px] text-neutral-600 line-clamp-2 mt-0.5 leading-snug">
-              {block.description.replace(/<[^>]*>/g, "").slice(0, 100)}
+              {(typeof block.description === "string" ? block.description : String(block.description)).replace(/<[^>]*>/g, "").slice(0, 100)}
             </p>
           )}
         </div>

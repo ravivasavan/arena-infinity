@@ -32,7 +32,7 @@ export interface ArenaBlock {
   } | null;
   source?: { url: string } | null;
   embed?: { url: string; type: string; html?: string } | null;
-  description?: string | null;
+  description?: string | { [key: string]: unknown } | null;
   connections?: ArenaChannel[];
   connected_at?: string;
   connection_count?: number;
