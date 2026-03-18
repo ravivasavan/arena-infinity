@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
   try {
     const channels = await searchChannels(q, token);
     return NextResponse.json({ channels });
-  } catch {
-    return NextResponse.json({ error: "Search failed" }, { status: 500 });
+  } catch (err) {
+    console.error("Search error:", err);
+    return NextResponse.json({ error: "Search failed", details: String(err) }, { status: 500 });
   }
 }

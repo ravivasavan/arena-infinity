@@ -64,12 +64,9 @@ export async function searchChannels(
   page = 1,
   per = 20
 ): Promise<ArenaChannel[]> {
-  // v3 search is Premium-only, fall back to v2
-  const res = await fetch(
-    `https://api.are.na/v2/search/channels?q=${encodeURIComponent(query)}&page=${page}&per=${per}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+  const data = await arenaFetch(
+    `/search?query=${encodeURIComponent(query)}&type=Channel&page=${page}&per=${per}`,
+    token
   );
-  if (!res.ok) throw new Error(`Are.na API error: ${res.status} ${res.statusText}`);
-  const data = await res.json();
-  return data.channels ?? [];
+  return data.results ?? data.contents ?? data.channels ?? [];
 }
