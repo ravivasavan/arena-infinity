@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { MiniMap, useReactFlow } from "@xyflow/react";
 import { X, MagnifyingGlass } from "@phosphor-icons/react";
 import type { ArenaChannel } from "@/types";
+import { getBlockCount, getChannelOwnerName } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
 
 export function ChannelIndex() {
@@ -126,7 +127,7 @@ export function ChannelIndex() {
                 className="block w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
               >
                 <span className="text-xs text-neutral-200 group-hover:text-white">{ch.title}</span>
-                <span className="ml-2 text-[10px] text-neutral-600">{ch.length}</span>
+                <span className="ml-2 text-[10px] text-neutral-600">{getBlockCount(ch)}</span>
               </button>
             ))}
           </div>
@@ -144,7 +145,7 @@ export function ChannelIndex() {
                 className="block w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
               >
                 <span className="text-xs text-neutral-200 group-hover:text-white">{ch.title}</span>
-                <span className="ml-2 text-[10px] text-neutral-600">{ch.length} · {ch.user?.username}</span>
+                <span className="ml-2 text-[10px] text-neutral-600">{getBlockCount(ch)} · {getChannelOwnerName(ch)}</span>
               </button>
             ))}
           </div>

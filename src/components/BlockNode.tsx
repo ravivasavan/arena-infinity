@@ -4,6 +4,7 @@ import { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { ArrowSquareOut, GitFork, ArrowsInSimple, Link as LinkIcon, Play, Paperclip, Globe } from "@phosphor-icons/react";
 import type { BlockNodeData } from "@/types";
+import { getBlockType, getBlockImageUrl } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
 
 function extractDomain(url: string): string {
@@ -32,10 +33,11 @@ function BlockNodeComponent({ id, data }: NodeProps) {
   };
 
   const block = nodeData.block;
-  const title = block.title || block.class || "Untitled";
-  const imageUrl = block.image?.display?.url || block.image?.thumb?.url;
+  const blockType = getBlockType(block);
+  const title = block.title || blockType || "Untitled";
+  const imageUrl = getBlockImageUrl(block);
   const sourceUrl = block.source?.url;
-  const plainContent = block.content?.replace(/<[^>]*>/g, "").trim();
+  const plainText = block.content ? (typeof block.content === "string" ? block.content.replace(/<[^>]*>/g, "").trim() : String(block.content)) : "";
 
   return (
     <>
@@ -51,18 +53,18 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         } ${nodeData.loading ? "animate-pulse" : ""}`}
       >
         {/* Image preview */}
-        {block.class === "Image" && imageUrl && (
+        {blockType === "Image" && imageUrl && (
           <div className="w-full bg-neutral-900">
             <img src={imageUrl} alt={title} className="w-full h-auto block" draggable={false} />
           </div>
         )}
 
         {/* Text block */}
-        {block.class === "Text" && (
+        {blockType === "Text" && (
           <div className="px-3 pt-3 pb-1">
-            {plainContent ? (
+            {plainText ? (
               <p className="text-xs text-neutral-300 line-clamp-6 leading-relaxed whitespace-pre-wrap">
-                {plainContent.slice(0, 300)}
+                {plainText.slice(0, 300)}
               </p>
             ) : (
               <p className="text-xs text-neutral-600 italic">Empty text block</p>
@@ -71,7 +73,7 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         )}
 
         {/* Link block */}
-        {block.class === "Link" && (
+        {blockType === "Link" && (
           <>
             {imageUrl && (
               <div className="w-full bg-neutral-900">
@@ -93,7 +95,7 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         )}
 
         {/* Media / Video block */}
-        {block.class === "Media" && (
+        {blockType === "Media" || blockType === "Embed" && (
           <>
             {imageUrl ? (
               <div className="w-full bg-neutral-900 relative">
@@ -116,7 +118,7 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         )}
 
         {/* Attachment block */}
-        {block.class === "Attachment" && (
+        {blockType === "Attachment" && (
           <>
             {imageUrl ? (
               <div className="w-full bg-neutral-900">
