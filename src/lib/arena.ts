@@ -1,6 +1,6 @@
 import type { ArenaChannel, ArenaBlock, ArenaUser } from "@/types";
 
-const BASE_URL = "https://api.are.na/v2";
+const BASE_URL = "https://api.are.na/v3";
 
 async function arenaFetch(path: string, token: string) {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -25,11 +25,11 @@ export async function getUserChannels(
   per = 50
 ): Promise<{ channels: ArenaChannel[]; total_pages: number }> {
   const data = await arenaFetch(
-    `/users/${userId}/channels?page=${page}&per=${per}`,
+    `/users/${userId}/contents?type=channels&page=${page}&per=${per}`,
     token
   );
   return {
-    channels: data.channels ?? data,
+    channels: data.contents ?? data.channels ?? data,
     total_pages: data.total_pages ?? 1,
   };
 }
@@ -54,8 +54,8 @@ export async function getBlockConnections(
   blockId: number,
   token: string
 ): Promise<ArenaChannel[]> {
-  const data = await arenaFetch(`/blocks/${blockId}`, token);
-  return data.connections ?? [];
+  const data = await arenaFetch(`/blocks/${blockId}/connections`, token);
+  return data.contents ?? data.connections ?? [];
 }
 
 export async function searchChannels(
@@ -65,8 +65,8 @@ export async function searchChannels(
   per = 20
 ): Promise<ArenaChannel[]> {
   const data = await arenaFetch(
-    `/search/channels?q=${encodeURIComponent(query)}&page=${page}&per=${per}`,
+    `/search?query=${encodeURIComponent(query)}&type=channels&page=${page}&per=${per}`,
     token
   );
-  return data.channels ?? [];
+  return data.contents ?? data.channels ?? [];
 }

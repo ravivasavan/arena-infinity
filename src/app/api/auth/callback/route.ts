@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing OAuth config" }, { status: 500 });
   }
 
-  const tokenRes = await fetch("https://dev.are.na/oauth/token", {
+  const tokenRes = await fetch("https://api.are.na/v3/oauth/token", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
