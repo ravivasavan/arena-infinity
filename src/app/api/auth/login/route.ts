@@ -11,7 +11,7 @@ export async function GET() {
     );
   }
 
-  const url = new URL("https://dev.are.na/oauth/authorize");
+  const url = new URL("https://www.are.na/oauth/authorize");
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
