@@ -152,7 +152,12 @@ export function ChannelIndex() {
 
         {!loading && filtered.length === 0 && externalResults.length === 0 && !searching && (
           <div className="px-3 py-4 text-xs text-neutral-500">
-            {query.trim() ? "No channels found" : "No channels yet"}
+            {query.trim() ? (
+              <>
+                <span className="block">No channels found</span>
+                <span className="block mt-1 text-neutral-600">Are.na search requires a Premium or Supporter plan</span>
+              </>
+            ) : "No channels yet"}
           </div>
         )}
       </div>
