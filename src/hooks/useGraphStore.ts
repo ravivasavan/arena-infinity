@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import type { Node, Edge } from "@xyflow/react";
 import type { ArenaChannel, ArenaBlock, ChannelNodeData, BlockNodeData } from "@/types";
-import { calculateLayout } from "@/lib/layout";
+import { calculateLayout, applyLayout, type LayoutMode } from "@/lib/layout";
 
 const CHANNEL_COLORS = [
   "#22c55e", // green
@@ -22,13 +22,13 @@ const CHANNEL_COLORS = [
 let colorIndex = 0;
 const channelColorMap = new Map<string, string>();
 
-function coloredEdge(id: string, source: string, target: string, type?: string): Edge {
+function coloredEdge(id: string, source: string, target: string, edgeType?: string): Edge {
   const color = channelColorMap.get(source) || channelColorMap.get(target);
   return {
     id,
     source,
     target,
-    ...(type ? { type } : {}),
+    type: edgeType || "labeled",
     ...(color ? { style: { stroke: `${color}60` } } : {}),
   };
 }
@@ -47,7 +47,9 @@ interface GraphState {
   expandedNodes: Set<string>;
   loadingNodes: Set<string>;
   activeNodeId: string | null;
+  layoutMode: LayoutMode;
 
+  setLayoutMode: (mode: LayoutMode) => void;
   addChannelNodes: (channels: ArenaChannel[], parentId?: string) => void;
   expandChannel: (channelSlug: string, nodeId: string) => Promise<void>;
   expandBlock: (blockId: number, nodeId: string) => Promise<void>;
@@ -72,6 +74,13 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   expandedNodes: new Set(),
   loadingNodes: new Set(),
   activeNodeId: null,
+  layoutMode: "force" as LayoutMode,
+
+  setLayoutMode: (mode) => {
+    const state = get();
+    const positioned = applyLayout(state.nodes, state.edges, mode, 0);
+    set({ nodes: positioned, layoutMode: mode });
+  },
 
   addChannelNodes: (channels, parentId) => {
     const state = get();
@@ -445,8 +454,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   relayout: () => {
     const state = get();
     if (state.nodes.length === 0) return;
-    // Re-run layout with zero fixed nodes so everything repositions
-    const positioned = calculateLayout(state.nodes, state.edges, 0);
+    const positioned = applyLayout(state.nodes, state.edges, state.layoutMode, 0);
     set({ nodes: positioned });
   },
 

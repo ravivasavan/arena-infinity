@@ -23,6 +23,23 @@
   background: rgba(255, 255, 255, 0.16);
 }
 
+/* Animated node positions */
+.react-flow__node {
+  transition: transform 0.35s ease;
+}
+
+/* Disable animation during drag */
+.react-flow__node.dragging {
+  transition: none;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__node {
+    transition: none;
+  }
+}
+
 .minimap-container .react-flow__minimap {
   width: 100% !important;
   height: 100% !important;

@@ -9,17 +9,27 @@ import {
   useReactFlow,
   type Node,
   type NodeTypes,
+  type EdgeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { ChannelNode } from "./ChannelNode";
 import { BlockNode } from "./BlockNode";
+import { LabeledEdge } from "./LabeledEdge";
 import { ChannelIndex } from "./ChannelIndex";
 import { CanvasControls } from "./CanvasControls";
 import { useGraphStore } from "@/hooks/useGraphStore";
+import { withAnimation } from "./AnimatedNode";
+
+const AnimatedChannelNode = withAnimation(ChannelNode);
+const AnimatedBlockNode = withAnimation(BlockNode);
 
 const nodeTypes: NodeTypes = {
-  channelNode: ChannelNode,
-  blockNode: BlockNode,
+  channelNode: AnimatedChannelNode,
+  blockNode: AnimatedBlockNode,
+};
+
+const edgeTypes: EdgeTypes = {
+  labeled: LabeledEdge,
 };
 
 export function Canvas() {
@@ -37,7 +47,8 @@ export function Canvas() {
   }, [storeNodes, setNodes]);
 
   useEffect(() => {
-    setEdges(storeEdges);
+    // Set all edges to use labeled type
+    setEdges(storeEdges.map((e) => ({ ...e, type: "labeled" })));
   }, [storeEdges, setEdges]);
 
   // Center on active node after layout changes
@@ -45,7 +56,6 @@ export function Canvas() {
     if (!activeNodeId || activeNodeId === prevActiveRef.current) return;
     prevActiveRef.current = activeNodeId;
 
-    // Small delay to let layout settle
     const timer = setTimeout(() => {
       const node = storeNodes.find((n) => n.id === activeNodeId);
       if (node) {
@@ -80,6 +90,7 @@ export function Canvas() {
     () => ({
       animated: false,
       style: { stroke: "#525252" },
+      type: "labeled",
     }),
     []
   );
@@ -93,6 +104,7 @@ export function Canvas() {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
         minZoom={0.05}
