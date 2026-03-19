@@ -80,11 +80,12 @@ export async function connectToChannel(
   sourceType: "Block" | "Channel",
   token: string
 ): Promise<void> {
-  await arenaFetch(`/channels/${channelSlug}/blocks`, token, {
-    method: "PUT",
+  await arenaFetch("/connections", token, {
+    method: "POST",
     body: JSON.stringify({
-      connectable_type: sourceType,
       connectable_id: sourceId,
+      connectable_type: sourceType,
+      channel_ids: [channelSlug],
     }),
   });
 }
