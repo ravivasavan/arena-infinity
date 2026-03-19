@@ -100,30 +100,32 @@ export function ChannelIndex() {
   }
 
   return (
-    <div className="absolute top-4 left-4 bottom-4 z-50 w-80 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm shadow-xl flex flex-col overflow-hidden">
+    <div className="absolute top-4 left-4 bottom-4 z-50 w-64 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm shadow-xl flex flex-col overflow-hidden">
       {/* Search */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-neutral-800 flex-shrink-0">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter or search…"
-          className="flex-1 rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
-        />
+      <div className="flex flex-col px-3 pt-2 pb-2 gap-1.5 border-b border-neutral-800 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search…"
+            className="flex-1 rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
+          />
+          <button
+            onClick={() => setCollapsed(true)}
+            className="text-neutral-500 hover:text-white flex-shrink-0"
+          >
+            <X size={14} />
+          </button>
+        </div>
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value as "all" | "mine")}
-          className="flex-shrink-0 bg-neutral-800 border border-neutral-700 text-neutral-400 text-xs rounded px-2 py-2 outline-none cursor-pointer hover:border-neutral-500 transition-colors"
+          className="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 text-xs rounded px-3 py-2 outline-none cursor-pointer hover:border-neutral-500 transition-colors"
         >
           <option value="all">All channels</option>
           <option value="mine">My channels</option>
         </select>
-        <button
-          onClick={() => setCollapsed(true)}
-          className="text-neutral-500 hover:text-white flex-shrink-0"
-        >
-          <X size={14} />
-        </button>
       </div>
 
       {/* Channel list */}
