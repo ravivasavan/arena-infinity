@@ -49,3 +49,8 @@
   border: none !important;
   border-radius: 0 !important;
 }
+
+.minimap-container .react-flow__minimap svg {
+  width: 100% !important;
+  height: 100% !important;
+}
