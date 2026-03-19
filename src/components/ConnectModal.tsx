@@ -110,14 +110,20 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
   }, [onClose]);
 
   const q = query.trim().toLowerCase();
-  const filteredUserChannels = q
+  const userChannelIds = new Set(userChannels.map((ch) => ch.id));
+
+  // When searching, merge: own channels matching locally + own channels from search results
+  // This ensures your channels always appear first, even if only the API search found them
+  const localMatches = q
     ? userChannels.filter((ch) => ch.title.toLowerCase().includes(q))
     : userChannels;
+  const searchMatchesOwn = q
+    ? searchResults.filter((sr) => userChannelIds.has(sr.id) && !localMatches.find((ch) => ch.id === sr.id))
+    : [];
+  const filteredUserChannels = [...localMatches, ...searchMatchesOwn];
 
-  const userChannelIds = new Set(userChannels.map((ch) => ch.id));
   const externalResults = searchResults.filter((sr) => !userChannelIds.has(sr.id));
 
-  // When searching, always show matching own channels first, then external
   const showOwnSection = !q || filteredUserChannels.length > 0;
   const showExternalSection = q && (externalResults.length > 0 || searching);
 
