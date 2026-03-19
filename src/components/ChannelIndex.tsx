@@ -187,6 +187,18 @@ export function ChannelIndex() {
           />
         </div>
       )}
+
+      {/* Footer */}
+      <div className="flex-shrink-0 border-t border-neutral-800 px-3 py-2.5 flex items-center justify-between">
+        <span className="text-[10px] text-neutral-600">by Ravi Vasavan</span>
+        <a
+          href="/changelog"
+          target="_blank"
+          className="text-[10px] text-neutral-600 hover:text-neutral-400 transition-colors"
+        >
+          Changelog
+        </a>
+      </div>
     </div>
   );
 }
