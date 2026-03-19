@@ -20,6 +20,7 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [connecting, setConnecting] = useState<number | null>(null);
+  const [mineOnly, setMineOnly] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -122,10 +123,12 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
     : [];
   const filteredUserChannels = [...localMatches, ...searchMatchesOwn];
 
-  const externalResults = searchResults.filter((sr) => !userChannelIds.has(sr.id));
+  const externalResults = mineOnly
+    ? []
+    : searchResults.filter((sr) => !userChannelIds.has(sr.id));
 
   const showOwnSection = !q || filteredUserChannels.length > 0;
-  const showExternalSection = q && (externalResults.length > 0 || searching);
+  const showExternalSection = !mineOnly && q && (externalResults.length > 0 || searching);
 
   return (
     <div
@@ -149,8 +152,8 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
         </div>
 
         {/* Search */}
-        <div className="px-5 pb-4">
-          <div className="flex items-center gap-2 rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2.5 focus-within:border-blue-500 transition-colors">
+        <div className="px-5 pb-4 flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2.5 focus-within:border-blue-500 transition-colors">
             <input
               ref={inputRef}
               type="text"
@@ -161,6 +164,17 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
             />
             <MagnifyingGlass size={16} className="text-neutral-500 flex-shrink-0" />
           </div>
+          <button
+            onClick={() => setMineOnly((v) => !v)}
+            title={mineOnly ? "Show all channels" : "Show only my channels"}
+            className={`flex-shrink-0 text-xs px-2.5 py-2 rounded-lg border transition-colors ${
+              mineOnly
+                ? "bg-neutral-700 border-neutral-600 text-white"
+                : "border-neutral-700 text-neutral-500 hover:text-white hover:border-neutral-600"
+            }`}
+          >
+            Mine
+          </button>
         </div>
 
         {/* Channel list */}

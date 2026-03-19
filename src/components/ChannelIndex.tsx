@@ -21,6 +21,7 @@ export function ChannelIndex() {
   const [searchResults, setSearchResults] = useState<ArenaChannel[]>([]);
   const [searching, setSearching] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [mineOnly, setMineOnly] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const addSearchChannel = useGraphStore((s) => s.addSearchChannel);
   const storeNodes = useGraphStore((s) => s.nodes);
@@ -83,9 +84,9 @@ export function ChannelIndex() {
     [getViewport, addSearchChannel]
   );
 
-  const externalResults = searchResults.filter(
-    (sr) => !channels.find((ch) => ch.id === sr.id)
-  );
+  const externalResults = mineOnly
+    ? []
+    : searchResults.filter((sr) => !channels.find((ch) => ch.id === sr.id));
 
   if (collapsed) {
     return (
@@ -109,6 +110,17 @@ export function ChannelIndex() {
           placeholder="Filter or search…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
         />
+        <button
+          onClick={() => setMineOnly((v) => !v)}
+          title={mineOnly ? "Show all channels" : "Show only my channels"}
+          className={`flex-shrink-0 text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+            mineOnly
+              ? "bg-neutral-600 text-white"
+              : "text-neutral-500 hover:text-white"
+          }`}
+        >
+          Mine
+        </button>
         <button
           onClick={() => setCollapsed(true)}
           className="text-neutral-500 hover:text-white flex-shrink-0"

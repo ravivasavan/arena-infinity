@@ -3,7 +3,7 @@
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { ArrowSquareOut, GitFork, ArrowsInSimple, Link as LinkIcon, Play, Paperclip, Globe, PlugsConnected } from "@phosphor-icons/react";
+import { ArrowSquareOut, GitFork, ArrowsInSimple, Link as LinkIcon, Play, Paperclip, Globe, Link } from "@phosphor-icons/react";
 import type { BlockNodeData } from "@/types";
 import { getBlockType, getBlockImageUrl } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
@@ -183,7 +183,7 @@ function BlockNodeComponent({ id, data }: NodeProps) {
             title="Connect to channel"
             className="flex-1 flex items-center justify-center py-1.5 text-neutral-500 hover:text-white hover:bg-neutral-700 transition-colors border-r border-neutral-700"
           >
-            <PlugsConnected size={12} />
+            <Link size={12} />
           </button>
           <button
             onClick={handleOpen}
