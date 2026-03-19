@@ -460,7 +460,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   relayout: () => {
     const state = get();
     if (state.nodes.length === 0) return;
-    const positioned = applyLayout(state.nodes, state.edges, state.layoutMode);
+    const positioned = calculateLayout(state.nodes, state.edges, 0);
     set({ nodes: positioned });
   },
 
