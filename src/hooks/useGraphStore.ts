@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import type { Node, Edge } from "@xyflow/react";
 import type { ArenaChannel, ArenaBlock, ChannelNodeData, BlockNodeData } from "@/types";
-import { calculateLayout, applyLayout, type LayoutMode } from "@/lib/layout";
+import { calculateLayout, calculateOrganicLayout, applyLayout, type LayoutMode } from "@/lib/layout";
 
 const CHANNEL_COLORS = [
   "#22c55e", // green
@@ -460,7 +460,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   relayout: () => {
     const state = get();
     if (state.nodes.length === 0) return;
-    const positioned = calculateLayout(state.nodes, state.edges, 0);
+    const positioned = calculateOrganicLayout(state.nodes, state.edges);
     set({ nodes: positioned });
   },
 

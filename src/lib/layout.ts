@@ -120,6 +120,52 @@ export function calculateTreeLayout(
   });
 }
 
+// ─── Force layout with no anchors — for organic full rearrange ───────────────
+
+export function calculateOrganicLayout(nodes: Node[], edges: Edge[]): Node[] {
+  if (nodes.length === 0) return nodes;
+
+  const simNodes: SimNode[] = nodes.map((node) => ({
+    id: node.id,
+    x: node.position.x,
+    y: node.position.y,
+    origX: node.position.x,
+    origY: node.position.y,
+    isExisting: false,
+  }));
+
+  const nodeIndex = new Map(simNodes.map((n, i) => [n.id, i]));
+
+  const simLinks: SimulationLinkDatum<SimNode>[] = edges
+    .filter((e) => nodeIndex.has(e.source as string) && nodeIndex.has(e.target as string))
+    .map((edge) => ({
+      source: nodeIndex.get(edge.source as string)!,
+      target: nodeIndex.get(edge.target as string)!,
+    }));
+
+  const collideRadius = Math.max(NODE_WIDTH, NODE_HEIGHT) * 0.9;
+
+  const simulation = forceSimulation(simNodes)
+    .force("link", forceLink(simLinks).distance(400).strength(0.3))
+    .force("charge", forceManyBody().strength(-1500).distanceMax(3000))
+    .force("collide", forceCollide<SimNode>(collideRadius).iterations(4).strength(1))
+    .force("centerX", forceX<SimNode>(0).strength(0.04))
+    .force("centerY", forceY<SimNode>(0).strength(0.04))
+    .stop();
+
+  for (let i = 0; i < 300; i++) {
+    simulation.tick();
+  }
+
+  return nodes.map((node, i) => ({
+    ...node,
+    position: {
+      x: Math.round(simNodes[i].x ?? node.position.x),
+      y: Math.round(simNodes[i].y ?? node.position.y),
+    },
+  }));
+}
+
 // ─── Unified layout dispatcher ───────────────────────────────────────────────
 
 export function applyLayout(
