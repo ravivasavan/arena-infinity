@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { MiniMap, useReactFlow } from "@xyflow/react";
-import { X, MagnifyingGlass } from "@phosphor-icons/react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import type { ArenaChannel } from "@/types";
 import { getBlockCount, getChannelOwnerName, getChannelStatus } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
@@ -20,7 +20,6 @@ export function ChannelIndex() {
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState<ArenaChannel[]>([]);
   const [searching, setSearching] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
   const [channelFilter, setChannelFilter] = useState<"all" | "mine">("all");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const addSearchChannel = useGraphStore((s) => s.addSearchChannel);
@@ -88,40 +87,21 @@ export function ChannelIndex() {
     ? []
     : searchResults.filter((sr) => !channels.find((ch) => ch.id === sr.id));
 
-  if (collapsed) {
-    return (
-      <button
-        onClick={() => setCollapsed(false)}
-        className="absolute top-4 left-4 z-50 flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors"
-      >
-        <MagnifyingGlass size={16} />
-      </button>
-    );
-  }
-
   return (
     <div className="absolute top-4 left-4 bottom-4 z-50 w-64 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm shadow-xl flex flex-col overflow-hidden">
       {/* Search */}
       <div className="flex flex-col px-3 pt-2 pb-2 gap-1.5 border-b border-neutral-800 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search…"
-            className="flex-1 rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
-          />
-          <button
-            onClick={() => setCollapsed(true)}
-            className="text-neutral-500 hover:text-white flex-shrink-0"
-          >
-            <X size={14} />
-          </button>
-        </div>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search…"
+          className="w-full rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
+        />
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value as "all" | "mine")}
-          className="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 text-xs rounded px-3 py-2 outline-none cursor-pointer hover:border-neutral-500 transition-colors"
+          className="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 text-xs rounded pl-3 pr-8 py-2 outline-none cursor-pointer hover:border-neutral-500 transition-colors appearance-auto"
         >
           <option value="all">All channels</option>
           <option value="mine">My channels</option>
