@@ -21,7 +21,7 @@ export function ChannelIndex() {
   const [searchResults, setSearchResults] = useState<ArenaChannel[]>([]);
   const [searching, setSearching] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [mineOnly, setMineOnly] = useState(false);
+  const [channelFilter, setChannelFilter] = useState<"all" | "mine">("all");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const addSearchChannel = useGraphStore((s) => s.addSearchChannel);
   const storeNodes = useGraphStore((s) => s.nodes);
@@ -84,7 +84,7 @@ export function ChannelIndex() {
     [getViewport, addSearchChannel]
   );
 
-  const externalResults = mineOnly
+  const externalResults = channelFilter === "mine"
     ? []
     : searchResults.filter((sr) => !channels.find((ch) => ch.id === sr.id));
 
@@ -110,17 +110,14 @@ export function ChannelIndex() {
           placeholder="Filter or search…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-800 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-neutral-500"
         />
-        <button
-          onClick={() => setMineOnly((v) => !v)}
-          title={mineOnly ? "Show all channels" : "Show only my channels"}
-          className={`flex-shrink-0 text-[10px] px-1.5 py-0.5 rounded transition-colors ${
-            mineOnly
-              ? "bg-neutral-600 text-white"
-              : "text-neutral-500 hover:text-white"
-          }`}
+        <select
+          value={channelFilter}
+          onChange={(e) => setChannelFilter(e.target.value as "all" | "mine")}
+          className="flex-shrink-0 bg-neutral-800 border border-neutral-700 text-neutral-400 text-[10px] rounded px-1.5 py-1 outline-none cursor-pointer hover:border-neutral-500 transition-colors"
         >
-          Mine
-        </button>
+          <option value="all">All channels</option>
+          <option value="mine">My channels</option>
+        </select>
         <button
           onClick={() => setCollapsed(true)}
           className="text-neutral-500 hover:text-white flex-shrink-0"

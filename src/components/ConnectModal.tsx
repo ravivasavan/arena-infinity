@@ -20,7 +20,7 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [connecting, setConnecting] = useState<number | null>(null);
-  const [mineOnly, setMineOnly] = useState(false);
+  const [channelFilter, setChannelFilter] = useState<"all" | "mine">("all");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -123,12 +123,12 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
     : [];
   const filteredUserChannels = [...localMatches, ...searchMatchesOwn];
 
-  const externalResults = mineOnly
+  const externalResults = channelFilter === "mine"
     ? []
     : searchResults.filter((sr) => !userChannelIds.has(sr.id));
 
   const showOwnSection = !q || filteredUserChannels.length > 0;
-  const showExternalSection = !mineOnly && q && (externalResults.length > 0 || searching);
+  const showExternalSection = channelFilter === "all" && q && (externalResults.length > 0 || searching);
 
   return (
     <div
@@ -164,17 +164,14 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
             />
             <MagnifyingGlass size={16} className="text-neutral-500 flex-shrink-0" />
           </div>
-          <button
-            onClick={() => setMineOnly((v) => !v)}
-            title={mineOnly ? "Show all channels" : "Show only my channels"}
-            className={`flex-shrink-0 text-xs px-2.5 py-2 rounded-lg border transition-colors ${
-              mineOnly
-                ? "bg-neutral-700 border-neutral-600 text-white"
-                : "border-neutral-700 text-neutral-500 hover:text-white hover:border-neutral-600"
-            }`}
+          <select
+            value={channelFilter}
+            onChange={(e) => setChannelFilter(e.target.value as "all" | "mine")}
+            className="flex-shrink-0 bg-neutral-800 border border-neutral-700 text-neutral-400 text-sm rounded-lg px-2.5 py-2.5 outline-none cursor-pointer hover:border-neutral-500 transition-colors"
           >
-            Mine
-          </button>
+            <option value="all">All channels</option>
+            <option value="mine">My channels</option>
+          </select>
         </div>
 
         {/* Channel list */}
