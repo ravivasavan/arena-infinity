@@ -21,7 +21,7 @@ interface SimNode extends SimulationNodeDatum {
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 160;
 
-export type LayoutMode = "force" | "tree" | "tree-lr";
+export type LayoutMode = "tree" | "tree-lr";
 
 // ─── Force-directed layout (existing) ────────────────────────────────────────
 
@@ -126,15 +126,12 @@ export function applyLayout(
   nodes: Node[],
   edges: Edge[],
   mode: LayoutMode,
-  fixedCount: number = 0
 ): Node[] {
   switch (mode) {
-    case "tree":
-      return calculateTreeLayout(nodes, edges, "TB");
     case "tree-lr":
       return calculateTreeLayout(nodes, edges, "LR");
-    case "force":
+    case "tree":
     default:
-      return calculateLayout(nodes, edges, fixedCount);
+      return calculateTreeLayout(nodes, edges, "TB");
   }
 }

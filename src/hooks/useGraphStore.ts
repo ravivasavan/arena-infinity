@@ -49,7 +49,6 @@ interface GraphState {
   activeNodeId: string | null;
   layoutMode: LayoutMode;
 
-  setLayoutMode: (mode: LayoutMode) => void;
   addChannelNodes: (channels: ArenaChannel[], parentId?: string) => void;
   expandChannel: (channelSlug: string, nodeId: string) => Promise<void>;
   expandBlock: (blockId: number, nodeId: string) => Promise<void>;
@@ -75,13 +74,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   expandedNodes: new Set(),
   loadingNodes: new Set(),
   activeNodeId: null,
-  layoutMode: "force" as LayoutMode,
-
-  setLayoutMode: (mode) => {
-    const state = get();
-    const positioned = applyLayout(state.nodes, state.edges, mode, 0);
-    set({ nodes: positioned, layoutMode: mode });
-  },
+  layoutMode: "tree" as LayoutMode,
 
   addChannelNodes: (channels, parentId) => {
     const state = get();
@@ -467,7 +460,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   relayout: () => {
     const state = get();
     if (state.nodes.length === 0) return;
-    const positioned = applyLayout(state.nodes, state.edges, state.layoutMode, 0);
+    const positioned = applyLayout(state.nodes, state.edges, state.layoutMode);
     set({ nodes: positioned });
   },
 
