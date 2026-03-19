@@ -4,8 +4,14 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { MiniMap, useReactFlow } from "@xyflow/react";
 import { X, MagnifyingGlass } from "@phosphor-icons/react";
 import type { ArenaChannel } from "@/types";
-import { getBlockCount, getChannelOwnerName } from "@/types";
+import { getBlockCount, getChannelOwnerName, getChannelStatus } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
+
+const statusColor: Record<string, string> = {
+  public: "bg-green-500",
+  closed: "bg-neutral-500",
+  private: "bg-red-500",
+};
 
 export function ChannelIndex() {
   const [channels, setChannels] = useState<ArenaChannel[]>([]);
@@ -124,10 +130,11 @@ export function ChannelIndex() {
               <button
                 key={ch.id}
                 onClick={() => handleSelect(ch)}
-                className="block w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
+                className="flex items-center w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
               >
-                <span className="text-xs text-neutral-200 group-hover:text-white">{ch.title}</span>
-                <span className="ml-2 text-[10px] text-neutral-600">{getBlockCount(ch)}</span>
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusColor[getChannelStatus(ch)] || "bg-neutral-500"}`} />
+                <span className="text-xs text-neutral-200 group-hover:text-white truncate ml-2">{ch.title}</span>
+                <span className="ml-2 text-[10px] text-neutral-600 flex-shrink-0">{getBlockCount(ch)}</span>
               </button>
             ))}
           </div>
@@ -142,10 +149,11 @@ export function ChannelIndex() {
               <button
                 key={ch.id}
                 onClick={() => handleSelect(ch)}
-                className="block w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
+                className="flex items-center w-full px-3 py-1.5 text-left hover:bg-neutral-800 transition-colors group"
               >
-                <span className="text-xs text-neutral-200 group-hover:text-white">{ch.title}</span>
-                <span className="ml-2 text-[10px] text-neutral-600">{getBlockCount(ch)} · {getChannelOwnerName(ch)}</span>
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusColor[getChannelStatus(ch)] || "bg-neutral-500"}`} />
+                <span className="text-xs text-neutral-200 group-hover:text-white truncate ml-2">{ch.title}</span>
+                <span className="ml-2 text-[10px] text-neutral-600 flex-shrink-0">{getBlockCount(ch)} · {getChannelOwnerName(ch)}</span>
               </button>
             ))}
           </div>

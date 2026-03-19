@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X, MagnifyingGlass } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import type { ArenaChannel } from "@/types";
-import { getBlockCount, getChannelOwnerName } from "@/types";
+import { getBlockCount, getChannelOwnerName, getChannelStatus } from "@/types";
 
 interface ConnectModalProps {
   sourceId: number;
@@ -217,6 +217,12 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
   );
 }
 
+const statusColor: Record<string, string> = {
+  public: "bg-green-500",
+  closed: "bg-neutral-500",
+  private: "bg-red-500",
+};
+
 function ChannelRow({
   channel,
   connecting,
@@ -226,13 +232,15 @@ function ChannelRow({
   connecting: boolean;
   onConnect: (ch: ArenaChannel) => void;
 }) {
+  const visibility = getChannelStatus(channel);
   return (
     <button
       onClick={() => onConnect(channel)}
       disabled={connecting}
       className="flex items-center w-full px-5 py-3 text-left hover:bg-neutral-800 transition-colors group disabled:opacity-50"
     >
-      <span className="flex-1 text-sm text-neutral-200 group-hover:text-white min-w-0 truncate">
+      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusColor[visibility] || "bg-neutral-500"}`} />
+      <span className="flex-1 text-sm text-neutral-200 group-hover:text-white min-w-0 truncate ml-2.5">
         {channel.title}
       </span>
       <span className="ml-3 text-xs text-neutral-600 tabular-nums flex-shrink-0">
