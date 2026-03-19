@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { ArrowSquareOut, GitFork, ArrowsInSimple, Link as LinkIcon, Play, Paperclip, Globe, PlugsConnected } from "@phosphor-icons/react";
 import type { BlockNodeData } from "@/types";
@@ -194,13 +195,14 @@ function BlockNodeComponent({ id, data }: NodeProps) {
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!bg-neutral-500" />
-      {showConnect && (
+      {showConnect && createPortal(
         <ConnectModal
           sourceId={block.id}
           sourceType="Block"
           sourceTitle={title}
           onClose={() => setShowConnect(false)}
-        />
+        />,
+        document.body
       )}
     </>
   );

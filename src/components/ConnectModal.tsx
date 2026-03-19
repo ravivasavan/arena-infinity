@@ -113,33 +113,38 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
   const filteredUserChannels = q
     ? userChannels.filter((ch) => ch.title.toLowerCase().includes(q))
     : userChannels;
-  const externalResults = searchResults.filter(
-    (sr) => !userChannels.find((ch) => ch.id === sr.id)
-  );
+
+  const userChannelIds = new Set(userChannels.map((ch) => ch.id));
+  const externalResults = searchResults.filter((sr) => !userChannelIds.has(sr.id));
+
+  // When searching, always show matching own channels first, then external
+  const showOwnSection = !q || filteredUserChannels.length > 0;
+  const showExternalSection = q && (externalResults.length > 0 || searching);
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
       onClick={onClose}
     >
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div
-        className="w-[400px] max-h-[520px] rounded-lg border border-neutral-700 bg-neutral-900 shadow-2xl flex flex-col overflow-hidden"
+        className="relative w-[460px] max-h-[560px] rounded-xl border border-neutral-700 bg-neutral-900 shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800">
-          <span className="flex-1 text-sm text-white truncate">{sourceTitle}</span>
+        <div className="flex items-center gap-3 px-5 py-4">
+          <span className="flex-1 text-base text-white font-medium truncate">{sourceTitle}</span>
           <button
             onClick={onClose}
-            className="text-neutral-500 hover:text-white transition-colors"
+            className="text-neutral-400 hover:text-white transition-colors p-1"
           >
-            <X size={16} />
+            <X size={18} weight="bold" />
           </button>
         </div>
 
         {/* Search */}
-        <div className="px-4 py-3 border-b border-neutral-800">
-          <div className="flex items-center gap-2 rounded border border-neutral-600 bg-neutral-800 px-3 py-2 focus-within:border-blue-500 transition-colors">
+        <div className="px-5 pb-4">
+          <div className="flex items-center gap-2 rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2.5 focus-within:border-blue-500 transition-colors">
             <input
               ref={inputRef}
               type="text"
@@ -148,79 +153,88 @@ export function ConnectModal({ sourceId, sourceType, sourceTitle, onClose }: Con
               placeholder="Type to search…"
               className="flex-1 bg-transparent text-sm text-white placeholder-neutral-500 outline-none"
             />
-            <MagnifyingGlass size={14} className="text-neutral-500 flex-shrink-0" />
+            <MagnifyingGlass size={16} className="text-neutral-500 flex-shrink-0" />
           </div>
         </div>
 
         {/* Channel list */}
-        <div className="overflow-y-auto flex-1 min-h-0">
+        <div className="overflow-y-auto flex-1 min-h-0 pb-2">
           {loading && (
-            <div className="px-4 py-6 text-xs text-neutral-500 text-center">Loading channels…</div>
+            <div className="px-5 py-8 text-sm text-neutral-500 text-center">Loading channels…</div>
           )}
 
-          {!loading && filteredUserChannels.length > 0 && (
+          {!loading && showOwnSection && (
             <div>
-              <div className="px-4 py-2 text-xs text-neutral-500 font-medium text-center border-b border-neutral-800">
-                Recent channels
+              <div className="px-5 py-2.5 text-xs text-neutral-500 font-medium text-center border-y border-neutral-800">
+                {q ? "Your channels" : "Recent channels"}
               </div>
-              {filteredUserChannels.map((ch) => (
-                <button
-                  key={ch.id}
-                  onClick={() => handleConnect(ch)}
-                  disabled={connecting === ch.id}
-                  className="flex items-center w-full px-4 py-2.5 text-left hover:bg-neutral-800 transition-colors group disabled:opacity-50"
-                >
-                  <span className="flex-1 text-sm text-neutral-200 group-hover:text-white truncate">
-                    {ch.title}
-                  </span>
-                  <span className="ml-2 text-xs text-neutral-600 flex-shrink-0">
-                    {getBlockCount(ch)}
-                  </span>
-                  <span className="ml-3 text-xs text-neutral-600 flex-shrink-0">
-                    {getChannelOwnerName(ch)}
-                  </span>
-                </button>
-              ))}
+              {filteredUserChannels.length > 0 ? (
+                filteredUserChannels.map((ch) => (
+                  <ChannelRow
+                    key={ch.id}
+                    channel={ch}
+                    connecting={connecting === ch.id}
+                    onConnect={handleConnect}
+                  />
+                ))
+              ) : (
+                q && <div className="px-5 py-3 text-xs text-neutral-600 text-center">No matching channels</div>
+              )}
             </div>
           )}
 
-          {q && searching && (
-            <div className="px-4 py-4 text-xs text-neutral-500 text-center">Searching…</div>
-          )}
-
-          {q && externalResults.length > 0 && (
-            <div className="border-t border-neutral-800">
-              <div className="px-4 py-2 text-xs text-neutral-500 font-medium text-center border-b border-neutral-800">
-                Are.na results
+          {showExternalSection && (
+            <div>
+              <div className="px-5 py-2.5 text-xs text-neutral-500 font-medium text-center border-y border-neutral-800">
+                Are.na {searching && "…"}
               </div>
               {externalResults.map((ch) => (
-                <button
+                <ChannelRow
                   key={ch.id}
-                  onClick={() => handleConnect(ch)}
-                  disabled={connecting === ch.id}
-                  className="flex items-center w-full px-4 py-2.5 text-left hover:bg-neutral-800 transition-colors group disabled:opacity-50"
-                >
-                  <span className="flex-1 text-sm text-neutral-200 group-hover:text-white truncate">
-                    {ch.title}
-                  </span>
-                  <span className="ml-2 text-xs text-neutral-600 flex-shrink-0">
-                    {getBlockCount(ch)}
-                  </span>
-                  <span className="ml-3 text-xs text-neutral-600 flex-shrink-0">
-                    {getChannelOwnerName(ch)}
-                  </span>
-                </button>
+                  channel={ch}
+                  connecting={connecting === ch.id}
+                  onConnect={handleConnect}
+                />
               ))}
+              {!searching && externalResults.length === 0 && (
+                <div className="px-5 py-3 text-xs text-neutral-600 text-center">No results</div>
+              )}
             </div>
           )}
 
-          {!loading && filteredUserChannels.length === 0 && externalResults.length === 0 && !searching && (
-            <div className="px-4 py-6 text-xs text-neutral-500 text-center">
-              {q ? "No channels found" : "No channels yet"}
-            </div>
+          {!loading && !q && filteredUserChannels.length === 0 && (
+            <div className="px-5 py-8 text-sm text-neutral-500 text-center">No channels yet</div>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+function ChannelRow({
+  channel,
+  connecting,
+  onConnect,
+}: {
+  channel: ArenaChannel;
+  connecting: boolean;
+  onConnect: (ch: ArenaChannel) => void;
+}) {
+  return (
+    <button
+      onClick={() => onConnect(channel)}
+      disabled={connecting}
+      className="flex items-center w-full px-5 py-3 text-left hover:bg-neutral-800 transition-colors group disabled:opacity-50"
+    >
+      <span className="flex-1 text-sm text-neutral-200 group-hover:text-white min-w-0 truncate">
+        {channel.title}
+      </span>
+      <span className="ml-3 text-xs text-neutral-600 tabular-nums flex-shrink-0">
+        {getBlockCount(channel)}
+      </span>
+      <span className="ml-4 text-xs text-neutral-600 flex-shrink-0">
+        {getChannelOwnerName(channel)}
+      </span>
+    </button>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { ArrowSquareOut, GridFour, ArrowsInSimple, Plus, PlugsConnected } from "@phosphor-icons/react";
 import type { ChannelNodeData, ArenaBlock } from "@/types";
@@ -164,13 +165,14 @@ function ChannelNodeComponent({ id, data }: NodeProps) {
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!bg-neutral-500" />
-      {showConnect && (
+      {showConnect && createPortal(
         <ConnectModal
           sourceId={nodeData.channel.id}
           sourceType="Channel"
           sourceTitle={nodeData.channel.title}
           onClose={() => setShowConnect(false)}
-        />
+        />,
+        document.body
       )}
     </>
   );
