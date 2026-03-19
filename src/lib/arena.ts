@@ -2,10 +2,13 @@ import type { ArenaChannel, ArenaBlock, ArenaUser } from "@/types";
 
 const BASE_URL = "https://api.are.na/v3";
 
-async function arenaFetch(path: string, token: string) {
+async function arenaFetch(path: string, token: string, options?: RequestInit) {
   const res = await fetch(`${BASE_URL}${path}`, {
+    ...options,
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      ...options?.headers,
     },
   });
   if (!res.ok) {
@@ -69,4 +72,19 @@ export async function searchChannels(
     token
   );
   return data.data ?? [];
+}
+
+export async function connectToChannel(
+  channelSlug: string,
+  sourceId: number,
+  sourceType: "Block" | "Channel",
+  token: string
+): Promise<void> {
+  await arenaFetch(`/channels/${channelSlug}/connections`, token, {
+    method: "POST",
+    body: JSON.stringify({
+      connectable_type: sourceType,
+      connectable_id: sourceId,
+    }),
+  });
 }

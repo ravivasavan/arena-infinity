@@ -1,11 +1,12 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { ArrowSquareOut, GridFour, ArrowsInSimple, Plus } from "@phosphor-icons/react";
+import { ArrowSquareOut, GridFour, ArrowsInSimple, Plus, PlugsConnected } from "@phosphor-icons/react";
 import type { ChannelNodeData, ArenaBlock } from "@/types";
 import { getBlockCount, getChannelStatus, getChannelOwnerSlug, getBlockThumbUrl, getBlockType } from "@/types";
 import { useGraphStore } from "@/hooks/useGraphStore";
+import { ConnectModal } from "./ConnectModal";
 
 const statusIcons: Record<string, string> = {
   public: "◉",
@@ -51,6 +52,7 @@ function ChannelNodeComponent({ id, data }: NodeProps) {
   const expandChannel = useGraphStore((s) => s.expandChannel);
   const loadMoreBlocks = useGraphStore((s) => s.loadMoreBlocks);
   const collapseNode = useGraphStore((s) => s.collapseNode);
+  const [showConnect, setShowConnect] = useState(false);
 
   const handleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -146,6 +148,13 @@ function ChannelNodeComponent({ id, data }: NodeProps) {
             </>
           )}
           <button
+            onClick={(e) => { e.stopPropagation(); setShowConnect(true); }}
+            title="Connect to channel"
+            className="flex-1 flex items-center justify-center py-1.5 text-neutral-500 hover:text-white hover:bg-neutral-700 transition-colors border-r border-neutral-700"
+          >
+            <PlugsConnected size={12} />
+          </button>
+          <button
             onClick={handleOpen}
             title="Open on Are.na"
             className="flex-1 flex items-center justify-center py-1.5 text-neutral-500 hover:text-white hover:bg-neutral-700 transition-colors"
@@ -155,6 +164,14 @@ function ChannelNodeComponent({ id, data }: NodeProps) {
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!bg-neutral-500" />
+      {showConnect && (
+        <ConnectModal
+          sourceId={nodeData.channel.id}
+          sourceType="Channel"
+          sourceTitle={nodeData.channel.title}
+          onClose={() => setShowConnect(false)}
+        />
+      )}
     </>
   );
 }
