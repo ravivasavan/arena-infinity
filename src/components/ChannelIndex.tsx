@@ -100,7 +100,7 @@ export function ChannelIndex() {
   }
 
   return (
-    <div className="absolute top-4 left-4 bottom-4 z-50 w-72 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm shadow-xl flex flex-col overflow-hidden">
+    <div className="absolute top-4 left-4 bottom-4 z-50 w-80 rounded-lg border border-neutral-700 bg-neutral-900/95 backdrop-blur-sm shadow-xl flex flex-col overflow-hidden">
       {/* Search */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-neutral-800 flex-shrink-0">
         <input
