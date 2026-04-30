@@ -13,7 +13,6 @@
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/postcss": "^4.2.1",
     "@xyflow/react": "^12.4.0",
-    "agentation": "^3.0.1",
     "d3-force": "^3.0.0",
     "framer-motion": "^12.38.0",
     "js-cookie": "^3.0.5",

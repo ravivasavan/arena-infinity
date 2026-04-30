@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-import { Agentation } from "agentation";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,7 +21,6 @@ export default function RootLayout({
       <body className="bg-black text-white antialiased">
         {children}
         <Toaster theme="dark" position="bottom-right" />
-        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   );
